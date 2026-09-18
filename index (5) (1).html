@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Instagram Media Hacking · handle with care </title>
+  <style>
+    /* ---------- RESET & GLOBAL ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Fira Code', 'Courier New', Courier, monospace;
+    }
+
+    body {
+      background: #000000;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      color: #e0e0e0;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* animated scanlines + glitch overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(0deg, rgba(255, 0, 60, 0.02) 0px, rgba(0, 255, 255, 0.01) 2px, transparent 3px, transparent 6px);
+      pointer-events: none;
+      z-index: 10;
+      animation: scan 8s linear infinite;
+    }
+
+    @keyframes scan {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 20px; }
+    }
+
+    /* subtle glitch flicker */
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 30% 40%, rgba(255, 0, 80, 0.03), transparent 70%);
+      pointer-events: none;
+      z-index: 9;
+      animation: glitchPulse 4s infinite alternate;
+    }
+
+    @keyframes glitchPulse {
+      0% { opacity: 0.2; }
+      100% { opacity: 0.6; }
+    }
+
+    /* ---------- MAIN CONTAINER (glassmorphism) ---------- */
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(12, 12, 18, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 0, 100, 0.45);
+      border-radius: 36px;
+      box-shadow: 0 0 30px rgba(255, 0, 80, 0.4), 0 0 10px rgba(180, 0, 255, 0.3), inset 0 0 20px rgba(255, 0, 255, 0.1);
+      padding: 28px 20px;
+      transition: all 0.3s;
+      position: relative;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    /* neon border animation */
+    .app-container::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 38px;
+      padding: 2px;
+      background: linear-gradient(135deg, #ff0055, #aa00ff, #ff0055);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      opacity: 0.7;
+      animation: borderRotate 5s linear infinite;
+    }
+
+    @keyframes borderRotate {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    /* ---------- TYPOGRAPHY ---------- */
+    h1 {
+      font-size: 1.9rem;
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(45deg, #ff3a6f, #b84dff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 15px #ff0066, 0 0 30px #9900ff;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .subhead {
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      color: #b0a0c0;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      border-bottom: 1px dashed rgba(255, 0, 120, 0.4);
+      padding-bottom: 10px;
+    }
+
+    /* ---------- DISCLAIMER ---------- */
+    .disclaimer {
+      background: rgba(255, 0, 60, 0.12);
+      border-left: 4px solid #ff0055;
+      padding: 10px 14px;
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      color: #ff99bb;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(255, 0, 80, 0.3);
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* ---------- HOME INPUT ---------- */
+    .input-group {
+      margin-bottom: 22px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #aa88ff;
+      margin-bottom: 8px;
+      text-shadow: 0 0 5px #aa00ff;
+    }
+
+    .input-group input {
+      width: 100%;
+      background: #0a0a10;
+      border: 2px solid #3a1a4a;
+      border-radius: 16px;
+      padding: 16px 18px;
+      font-size: 1.1rem;
+      color: #fff;
+      outline: none;
+      transition: 0.25s;
+      box-shadow: inset 0 0 10px #000000, 0 0 8px rgba(180, 0, 255, 0.3);
+      font-family: 'Fira Code', monospace;
+    }
+
+    .input-group input:focus {
+      border-color: #ff2a6d;
+      box-shadow: 0 0 18px #ff0066, inset 0 0 10px #1a001a;
+      background: #0f0a14;
+    }
+
+    .input-group input::placeholder {
+      color: #5a4a6a;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 18px 10px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #ff1a5e, #b200ff);
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 20px #ff0066, 0 8px 0 #3a003a;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      font-family: inherit;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 25px #ff00aa, 0 4px 0 #3a003a;
+    }
+
+    .btn.secondary {
+      background: linear-gradient(135deg, #2a1a3a, #1a0a2a);
+      box-shadow: 0 0 12px #aa00ff, 0 6px 0 #10001a;
+      color: #ccbbff;
+      font-size: 1rem;
+      padding: 14px 10px;
+    }
+
+    /* ---------- SIMULATION TERMINAL (full screen) ---------- */
+    .sim-screen {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      min-height: 70vh;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 28px;
+      border: 1px solid #ff2a6d;
+      box-shadow: 0 0 40px #ff0066, inset 0 0 30px #1a001a;
+      padding: 18px 14px;
+      backdrop-filter: blur(8px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sim-screen.active {
+      display: flex;
+    }
+
+    /* scan line effect inside terminal */
+    .sim-screen::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 4px;
+      background: linear-gradient(90deg, transparent, #ff00aa, transparent);
+      animation: scanlineMove 2.5s linear infinite;
+      opacity: 0.5;
+    }
+
+    @keyframes scanlineMove {
+      0% { top: -10px; }
+      100% { top: 110%; }
+    }
+
+    .sim-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #ff88aa;
+      border-bottom: 1px solid #ff2a6d;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      text-shadow: 0 0 8px #ff0066;
+    }
+
+    .target-line {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #ffb3ff;
+      text-shadow: 0 0 10px #ff00ff;
+      margin-bottom: 8px;
+      word-break: break-all;
+    }
+
+    .timer {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 4px;
+      color: #ff3366;
+      text-shadow: 0 0 15px #ff0044, 0 0 30px #aa00ff;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 22px;
+      background: #120012;
+      border-radius: 20px;
+      border: 1px solid #ff2a6d;
+      box-shadow: inset 0 0 12px #000000, 0 0 8px #ff0066;
+      margin: 16px 0 12px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff0066, #cc00ff, #ff00aa);
+      box-shadow: 0 0 20px #ff00aa, 0 0 40px #9900ff;
+      transition: width 0.2s linear;
+      border-radius: 20px;
+      position: relative;
+    }
+
+    .progress-bar::after {
+      content: "";
+      position: absolute;
+      top: 0; right: 0; bottom: 0; width: 20px;
+      background: linear-gradient(90deg, transparent, #ffffff88);
+      filter: blur(6px);
+    }
+
+    .terminal-window {
+      background: #050008;
+      border: 1px solid #4a1a5a;
+      border-radius: 16px;
+      padding: 14px 12px;
+      height: 240px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: #d0b0ff;
+      box-shadow: inset 0 0 30px #000000, 0 0 18px #330033;
+      margin-bottom: 14px;
+      scroll-behavior: smooth;
+      font-family: 'Fira Code', 'Courier New', monospace;
+      word-break: break-word;
+      position: relative;
+    }
+
+    .terminal-window::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .terminal-window::-webkit-scrollbar-thumb {
+      background: #ff2a6d;
+      border-radius: 10px;
+    }
+
+    .log-line {
+      opacity: 0.9;
+      text-shadow: 0 0 4px #ff00aa33;
+      margin-bottom: 3px;
+      animation: fadeInLine 0.2s;
+    }
+
+    @keyframes fadeInLine {
+      from { opacity: 0; transform: translateX(-4px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .glitch-text {
+      animation: glitch 0.4s infinite alternate;
+      color: #ffaaff;
+    }
+
+    @keyframes glitch {
+      0% { text-shadow: 2px 0 #ff0066, -2px 0 #00ffff; }
+      100% { text-shadow: -2px 0 #ff0066, 2px 0 #00ffff; }
+    }
+
+    .fake-percent {
+      color: #ffaa00;
+      font-weight: bold;
+      text-shadow: 0 0 8px #ffaa00;
+    }
+
+    /* ---------- RESULT SCREEN ---------- */
+    .result-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px 6px;
+    }
+
+    .result-screen.active {
+      display: flex;
+    }
+
+    .error-title {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: 6px;
+      color: #ff0033;
+      text-shadow: 0 0 30px #ff0000, 0 0 60px #aa00ff, 0 0 100px #ff00aa;
+      margin: 10px 0 18px;
+      animation: glitchTitle 0.8s infinite alternate;
+      line-height: 1;
+    }
+
+    @keyframes glitchTitle {
+      0% { transform: skew(0deg); opacity: 1; }
+      20% { transform: skew(3deg); opacity: 0.9; }
+      40% { transform: skew(-3deg); opacity: 1; }
+      100% { transform: skew(0deg); opacity: 1; }
+    }
+
+    .error-code {
+      font-size: 1.7rem;
+      background: #200010;
+      padding: 12px 24px;
+      border-radius: 40px;
+      border: 2px solid #ff0055;
+      box-shadow: 0 0 30px #ff0055;
+      margin: 16px 0;
+      color: #ff99cc;
+      font-weight: bold;
+    }
+
+    .highlight-box {
+      background: rgba(255, 0, 60, 0.15);
+      border: 2px solid #ff0055;
+      border-radius: 24px;
+      padding: 22px 12px;
+      margin: 20px 0;
+      width: 100%;
+      box-shadow: 0 0 30px #ff0055, inset 0 0 20px #330033;
+    }
+
+    .highlight-box p {
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin: 12px 0;
+      color: #ffbbff;
+      text-shadow: 0 0 15px #ff00ff, 0 0 30px #aa00ff;
+      text-transform: uppercase;
+    }
+
+    .small-note {
+      font-size: 0.7rem;
+      color: #aa88aa;
+      letter-spacing: 1px;
+      margin-top: 12px;
+      text-transform: uppercase;
+    }
+
+    /* utilities */
+    .hidden { display: none; }
+    .mt-2 { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="app-container" id="appContainer">
+    <!-- ========== HOME SCREEN ========== -->
+    <div id="homeScreen">
+      <h1>SOCIAL MEDIA<br>HACKING </h1>
+      <div class="subhead">Educational purposes only•  Real Accounts  Accessing is a crime </div>
+
+      <div class="disclaimer">
+        ⚠ EDUCATION PURPOSE ONLY — DO NOT MISS USE IT .
+      </div>
+
+      <div class="input-group">
+        <label for="usernameInput">Enter Username / ID</label>
+        <input type="text" id="usernameInput" placeholder="@example_user" autocomplete="off" spellcheck="false">
+      </div>
+
+      <button class="btn" id="startBtn">START SIMULATION</button>
+    </div>
+
+    <!-- ========== SIMULATION SCREEN ========== -->
+    <div id="simScreen" class="sim-screen">
+      <div class="sim-header">
+        <span>SIMULATION ACTIVE</span>
+        <span id="fakeServerId">SRV: SIM-XXXX</span>
+      </div>
+      <div class="target-line" id="targetDisplay">TARGET: @unknown</div>
+      <div class="timer" id="timerDisplay">02:00</div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="terminal-window" id="terminalWindow">
+        <!-- messages injected here -->
+      </div>
+      <div style="font-size:0.6rem; color:#aa77aa; text-align:center; letter-spacing:1px;">FICTIONAL SIMULATION — NO REAL DATA</div>
+    </div>
+
+    <!-- ========== RESULT SCREEN ========== -->
+    <div id="resultScreen" class="result-screen">
+      <div class="error-title">SERVER ERROR</div>
+      <div style="font-size:1.1rem; color:#ffaacc; letter-spacing:1px;">"Connection to simulation server failed."</div>
+      <div class="error-code">ERROR CODE: SIM-503</div>
+      <div style="color:#cc88cc; margin-bottom:10px;">"The simulated request could not be completed."</div>
+
+      <div class="highlight-box">
+        <p>NO ACCOUNT WAS ACCESSED</p>
+        <p>NO PASSWORD WAS RETRIEVED</p>
+        <p>SIMULATION ONLY</p>
+      </div>
+
+      <button class="btn secondary" id="tryAgainBtn">TRY AGAIN</button>
+      <button class="btn secondary" id="returnHomeBtn">RETURN HOME</button>
+      <div class="small-note">No real systems were contacted</div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ----- DOM elements -----
+      const homeScreen = document.getElementById('homeScreen');
+      const simScreen = document.getElementById('simScreen');
+      const resultScreen = document.getElementById('resultScreen');
+      const appContainer = document.getElementById('appContainer');
+
+      const usernameInput = document.getElementById('usernameInput');
+      const startBtn = document.getElementById('startBtn');
+      const targetDisplay = document.getElementById('targetDisplay');
+      const timerDisplay = document.getElementById('timerDisplay');
+      const progressBar = document.getElementById('progressBar');
+      const terminalWindow = document.getElementById('terminalWindow');
+      const fakeServerId = document.getElementById('fakeServerId');
+
+      const tryAgainBtn = document.getElementById('tryAgainBtn');
+      const returnHomeBtn = document.getElementById('returnHomeBtn');
+
+      // ----- STATE -----
+      let simulationInterval = null;
+      let messageInterval = null;
+      let timerInterval = null;
+      let simulationStartTime = null;
+      let remainingSeconds = 120;        // 2 minutes
+      const totalDuration = 120;         // seconds
+
+      // ----- FICTIONAL MESSAGE POOL (never real hacking commands) -----
+      const MESSAGE_POOL = [
+        "Initializing security simulation...",
+        "Connecting to fictional server...",
+        "Analyzing simulated security layers...",
+        "Scanning fictional account structure...",
+        "Running authentication simulation...",
+        "Checking simulated security protocols...",
+        "Generating encrypted data simulation...",
+        "Analyzing fictional access nodes...",
+        "Running account recovery simulation...",
+        "Verifying simulated server response...",
+        "Processing request...",
+        "Retrying simulated connection...",
+        "Waiting for server response...",
+        "Simulating handshake protocol...",
+        "Fictional token validation...",
+        "Simulated firewall traversal...",
+        "Decrypting dummy data package...",
+        "Pseudo-random access check...",
+        "Simulated latency test...",
+        "Fictional response parsing...",
+      ];
+
+      // helper: get random int
+      const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+      // generate a random fake server id (like SRV: SIM-4A7F)
+      function generateFakeServerId() {
+        const chars = 'ABCDEF0123456789';
+        let id = 'SRV: SIM-';
+        for (let i = 0; i < 4; i++) id += chars[Math.floor(Math.random() * chars.length)];
+        return id;
+      }
+
+      // update timer display from remaining seconds
+      function updateTimerDisplay(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }
+
+      // progress bar based on elapsed seconds
+      function updateProgress(elapsedSeconds) {
+        let percent = Math.min(100, (elapsedSeconds / totalDuration) * 100);
+        progressBar.style.width = percent + '%';
+      }
+
+      // append a log line to the terminal with typing effect / glitch
+      function addTerminalLine(text, isGlitch = false) {
+        const line = document.createElement('div');
+        line.className = 'log-line' + (isGlitch ? ' glitch-text' : '');
+        // Add a fake random percentage sometimes
+        const percentHtml = Math.random() > 0.6 ? ` <span class="fake-percent">[${rand(1, 99)}%]</span>` : '';
+        // Add fake processing number occasionally
+        const procNum = Math.random() > 0.7 ? ` #${rand(1000, 9999)}` : '';
+        line.innerHTML = `> ${text}${percentHtml}${procNum}`;
+        terminalWindow.appendChild(line);
+        // Auto-scroll to bottom
+        terminalWindow.scrollTop = terminalWindow.scrollHeight;
+
+        // Limit terminal lines to 30 for performance
+        if (terminalWindow.children.length > 30) {
+          terminalWindow.removeChild(terminalWindow.firstChild);
+        }
+      }
+
+      // ----- clean up all intervals -----
+      function clearAllIntervals() {
+        if (simulationInterval) clearInterval(simulationInterval);
+        if (messageInterval) clearInterval(messageInterval);
+        if (timerInterval) clearInterval(timerInterval);
+        simulationInterval = null;
+        messageInterval = null;
+        timerInterval = null;
+      }
+
+      // ----- reset UI to home screen -----
+      function resetToHome() {
+        clearAllIntervals();
+        // hide simulation and result, show home
+        simScreen.classList.remove('active');
+        resultScreen.classList.remove('active');
+        homeScreen.style.display = 'block';
+        // reset terminal and progress
+        terminalWindow.innerHTML = '';
+        progressBar.style.width = '0%';
+        timerDisplay.textContent = '02:00';
+        usernameInput.value = '';
+        usernameInput.disabled = false;
+        // remove any leftover glitch
+      }
+
+      // ----- start the 2-minute simulation -----
+      function startSimulation() {
+        const rawUsername = usernameInput.value.trim();
+        if (!rawUsername) {
+          alert('Please enter a username or ID (simulation only).');
+          return;
+        }
+
+        // sanitize display (no real data, just for visual)
+        let displayUsername = rawUsername.startsWith('@') ? rawUsername : '@' + rawUsername;
+        // limit length to avoid layout break
+        if (displayUsername.length > 24) displayUsername = displayUsername.substring(0, 21) + '...';
+
+        // switch screens
+        homeScreen.style.display = 'none';
+        simScreen.classList.add('active');
+        resultScreen.classList.remove('active');
+
+        // set target and server id
+        targetDisplay.textContent = `TARGET: ${displayUsername}`;
+        fakeServerId.textContent = generateFakeServerId();
+
+        // reset terminal and progress
+        terminalWindow.innerHTML = '';
+        progressBar.style.width = '0%';
+        remainingSeconds = totalDuration;
+        updateTimerDisplay(remainingSeconds);
+
+        // clear any old intervals
+        clearAllIntervals();
+
+        // initial messages
+        addTerminalLine('Initializing security simulation...');
+        addTerminalLine(`Target set: ${displayUsername} (fictional)`, true);
+
+        // ----- timer & progress (updates every second) -----
+        const startTime = Date.now();
+        simulationStartTime = startTime;
+
+        timerInterval = setInterval(() => {
+          const elapsed = Math.floor((Date.now() - startTime) / 1000);
+          const remaining = Math.max(0, totalDuration - elapsed);
+          remainingSeconds = remaining;
+          updateTimerDisplay(remaining);
+          updateProgress(elapsed);
+
+          // if time reached 0, end simulation
+          if (remaining <= 0) {
+            clearAllIntervals();
+            // make sure progress is full
+            progressBar.style.width = '100%';
+            // show result screen
+            simScreen.classList.remove('active');
+            resultScreen.classList.add('active');
+            // scroll result into view (if needed)
+          }
+        }, 250); // using 250ms for smooth progress
+
+        // ----- random messages every 2-4 seconds -----
+        let messageCounter = 0;
+        const MAX_MESSAGES_BEFORE_END = 40; // safety
+
+        function scheduleNextMessage() {
+          if (remainingSeconds <= 0) return;
+          // pick random message from pool, but avoid immediate repetition
+          let msg = MESSAGE_POOL[Math.floor(Math.random() * MESSAGE_POOL.length)];
+          // occasionally add glitch effect
+          const glitch = Math.random() > 0.8;
+          addTerminalLine(msg, glitch);
+          messageCounter++;
+
+          // random delay between 1.8 and 4.2 seconds
+          const delay = rand(1800, 4200);
+          messageInterval = setTimeout(() => {
+            if (remainingSeconds > 0 && simulationStartTime) {
+              scheduleNextMessage();
+            }
+          }, delay);
+        }
+
+        // start first message after short delay
+        messageInterval = setTimeout(() => {
+          if (remainingSeconds > 0) scheduleNextMessage();
+        }, 800);
+
+        // ----- ensure that after exactly 120 seconds we stop -----
+        // backup timeout for exact 2 minutes (120000 ms)
+        setTimeout(() => {
+          if (remainingSeconds > 0) {
+            // force finish if for some reason timer didn't
+            clearAllIntervals();
+            remainingSeconds = 0;
+            updateTimerDisplay(0);
+            progressBar.style.width = '100%';
+            simScreen.classList.remove('active');
+            resultScreen.classList.add('active');
+          }
+        }, 120500); // slightly after 2 minutes
+      }
+
+      // ----- event listeners -----
+      startBtn.addEventListener('click', startSimulation);
+
+      // allow enter key on input
+      usernameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          startSimulation();
+        }
+      });
+
+      // TRY AGAIN: restart with same username? Go back to home with cleared input? 
+      // Spec says: "TRY AGAIN" probably restarts simulation with same target, but we need to be safe.
+      // We'll restart the simulation directly with the same username if present, else go home.
+      tryAgainBtn.addEventListener('click', () => {
+        // hide result screen
+        resultScreen.classList.remove('active');
+        // if we have a username, restart simulation; otherwise go home
+        if (usernameInput.value.trim() !== '') {
+          // re-run simulation with same username
+          simScreen.classList.add('active');
+          startSimulation(); // this reads usernameInput again
+        } else {
+          // fallback
+          resetToHome();
+        }
+      });
+
+      // RETURN HOME: reset everything
+      returnHomeBtn.addEventListener('click', () => {
+        resetToHome();
+      });
+
+      // Also when simulation is active, avoid accidental page unload? not needed.
+      // prefill placeholder is static, but we don't store anything.
+
+      // For safety, if user navigates away or reloads, nothing stored.
+      // Cleanup on page hide (not required, but good practice)
+      window.addEventListener('beforeunload', () => {
+        clearAllIntervals();
+      });
+
+      // ensure that input field does not accept password-like content? It's just text.
+      // No password fields anywhere. Good.
+
+      // also remove any autocomplete that might trigger credential saving
+      usernameInput.setAttribute('autocomplete', 'off');
+      usernameInput.setAttribute('aria-label', 'Simulation username (fictional)');
+
+      // initial state: home visible
+      resetToHome();
+
+      // small glitch effect on the title container periodically (purely visual)
+      setInterval(() => {
+        if (simScreen.classList.contains('active')) {
+          // subtle flicker on target line
+          targetDisplay.style.opacity = '0.9';
+          setTimeout(() => targetDisplay.style.opacity = '1', 50);
+        }
+      }, 3000);
+    })();
+  </script>
+</body>
+</html>
